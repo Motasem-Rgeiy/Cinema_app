@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - Cinema Booking{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px; max-width: 600px;">
+    <div style="background-color: var(--secondary-bg); padding: 40px; border-radius: var(--border-radius);">
+        <h2 style="text-align: center; margin-bottom: 30px;">Payment Details</h2>
+        
+        <form action="/confirmation/" method="GET">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="example@mail.com" required>
+            </div>
+            
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Doe" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (for account creation)</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="********" required>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Pay $300 Now</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

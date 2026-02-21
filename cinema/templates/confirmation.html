@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed - Cinema Booking{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px; text-align: center;">
+    <div style="background-color: var(--secondary-bg); padding: 50px; border-radius: var(--border-radius); max-width: 700px; margin: 0 auto;">
+        <div style="font-size: 4rem; color: #4CAF50; margin-bottom: 20px;">✓</div>
+        <h2 style="margin-bottom: 10px;">Booking Successful!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 40px;">You have successfully booked your seats. A confirmation email has been sent.</p>
+        
+        <div style="text-align: left; border-top: 1px solid #444; padding-top: 30px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <span>Movie Name:</span>
+                <span style="font-weight: bold;">Interstellar</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <span>User Name:</span>
+                <span style="font-weight: bold;">John Doe</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <span>Payment Method:</span>
+                <span style="font-weight: bold;">Credit Card</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem;">
+                <span>Total Amount:</span>
+                <span style="font-weight: bold; color: #ff4b2b;">$300</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <a href="/" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

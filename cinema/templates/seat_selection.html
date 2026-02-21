@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load my_filters %}
+
+{% block title %}Select Seats - Interstellar{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px;">
+    <h2 style="text-align: center;">Select Your Seats</h2>
+    
+    <div class="seats-container">
+        <div class="screen"></div>
+        
+        <!-- Rows of seats -->
+        {% for row in rows %}
+        <div class="row">
+                {% for column in columns %}
+                    <div class="seat" data-seat={{row|name}}{{column}}></div>
+                {% endfor %}
+            </div>
+        
+        {% endfor %}
+
+         <div class="row">
+            <div class="seat" data-seat="A1"></div>
+            <div class="seat" data-seat="A2"></div>
+            <div class="seat occupied"></div>
+            <div class="seat" data-seat="A4"></div>
+            <div class="seat" data-seat="A5"></div>
+            <div class="seat" data-seat="A6"></div>
+            <div class="seat" data-seat="A7"></div>
+            <div class="seat" data-seat="A8"></div>
+        </div>
+  
+    </div>
+
+    <div style="background-color: var(--secondary-bg); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+        <p>Selected Seats: <span id="selected-seats-list">None</span></p>
+        <p>Total Tickets: <span id="total-tickets">0</span></p>
+        <p>Total Amount: <span id="total-amount">$0</span></p>
+        
+        <div style="margin-top: 20px;">
+            <a href="/cart/" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    const seats = document.querySelectorAll('.seat:not(.occupied)');
+    const totalTickets = document.getElementById('total-tickets');
+    const totalAmount = document.getElementById('total-amount');
+    const selectedSeatsList = document.getElementById('selected-seats-list');
+    const ticketPrice = 150; // Demo price
+
+    seats.forEach(seat => {
+        seat.addEventListener('click', () => {
+            seat.classList.toggle('selected');
+            updateSelection();
+        });
+    });
+
+    function updateSelection() {
+        const selectedSeats = document.querySelectorAll('.seat.selected');
+        const count = selectedSeats.length;
+        const seatNames = Array.from(selectedSeats).map(s => s.getAttribute('data-seat'));
+        
+        totalTickets.innerText = count;
+        totalAmount.innerText = '$' + (count * ticketPrice);
+        selectedSeatsList.innerText = seatNames.length > 0 ? seatNames.join(', ') : 'None';
+    }
+</script>
+{% endblock %}
+{% endblock %}

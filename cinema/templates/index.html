@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Cinema Booking{% endblock %}
+
+{% block content %}
+<section class="hero" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+    <div class="hero-content">
+        <h1>Book your tickets</h1>
+        <p>Choose your favorite film and get your ticket</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="movie-grid">
+        <!-- Static Demo Cards -->
+          {% for movie in page_obj %}
+        <div class="movie-card" onclick="location.href='/movie/1/'">
+           
+                    
+           
+            <img src="{{movie.image.url}}" alt="Movie 1" class="movie-poster">
+            <div class="movie-info">
+                <div class="movie-title">{{movie.name}}</div>
+                <p style="color: var(--text-muted);">{{movie.category}}</p>
+                <a href="{% url "event_details" movie.id %}" class="btn btn-primary" style="width: 100%; text-align: center; box-sizing: border-box;">Book Now</a>
+            </div>
+        </div>
+
+         {% endfor %}
+
+  
+
+     
+       
+    </div>
+
+    <div class="pagination">
+        {% if page_obj.paginator.count > 0 %}
+
+            {% if page_obj.has_previous %}
+
+                    <a href="?page={{page_obj.previous_page_number}}" class="btn btn-primary" >Previous</a>
+             {% else %}
+                    <a href='#' class="btn btn-primary" disabled >Previous</a>
+            
+            {% endif %}
+            
+             {% if page_obj.has_next %}
+
+                    <a href="?page={{page_obj.next_page_number}}" class="btn btn-primary" >Next</a>
+             {% else %}
+                    <a href="#" class="btn btn-primary" disabled >Next</a>
+           
+
+            {% endif %}
+            
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+

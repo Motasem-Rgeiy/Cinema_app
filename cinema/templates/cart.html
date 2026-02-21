@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Your Cart - Cinema Booking{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px;">
+    <h2>Your Cart</h2>
+    
+    <div class="cart-items">
+        <!-- Demo Cart Item -->
+        <div class="cart-item">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60" alt="Interstellar" style="width: 80px; border-radius: 8px;">
+                <div>
+                    <h3>Interstellar</h3>
+                    <p style="color: var(--text-muted);">Seats: A1, A2 | Time: 07:00 PM</p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 1.2rem; font-weight: bold;">$300</p>
+                <button class="btn" style="color: #ff4b2b; padding: 0;">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: right; background-color: var(--secondary-bg); padding: 20px; border-radius: var(--border-radius);">
+        <h3>Total: $300</h3>
+        <a href="/payment/" class="btn btn-primary" style="margin-top: 10px;">Proceed to Payment</a>
+    </div>
+</div>
+{% endblock %}

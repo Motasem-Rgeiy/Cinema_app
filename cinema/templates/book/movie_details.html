@@ -1,0 +1,179 @@
+
+
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block title %}Interstellar - Details{% endblock %}
+
+
+{% block content %}
+
+<section class="hero" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+
+    <div class="hero-content">
+
+        <h1>{{movie.name}}</h1>
+
+    </div>
+
+</section>
+
+
+<div class="container">
+
+    <div class="movie-details-container">
+
+        <img src="{{movie.image.url}}" alt="Interstellar" class="movie-details-poster">
+
+       
+
+        <div class="movie-details-info">
+
+            <h2>Description</h2>
+
+            <p>{{movie.description}}</p>
+
+           
+
+            <h3>Cast</h3>
+
+           
+
+            <div class="cast-grid">
+
+                {% for member in movie.members.all %}
+
+                    <div class="cast-item">
+
+                       
+
+                        <img src="{{member.image.url}}" alt="Actor 1" class="cast-img">
+
+                        <p>{{member.name}}</p>
+
+                    </div>
+
+                {% endfor %}
+
+               
+
+             
+
+            </div>
+
+
+
+            <div style="margin-top: 30px;">
+                <h3>Select Cinema Location</h3>
+                
+                <select class="form-control" id="location-select">
+
+                    <option value="">Choose Location</option>
+                    {% for loc in locations %}
+                    <option value="{{loc.id}}">{{loc}}</option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div id="time-selection" style="margin-top: 20px; display: none;">
+
+                <h3>Available Times</h3>
+
+               
+
+                <div style="display: flex; gap: 10px;">
+
+                    <button class="btn btn-primary">12:00 PM</button>
+
+                    <button class="btn btn-primary">03:30 PM</button>
+
+                    <button class="btn btn-primary">07:00 PM</button>
+
+                    <button class="btn btn-primary">10:30 PM</button>
+
+                </div>
+
+            </div>
+
+
+            <div style="margin-top: 30px;">
+
+                <a id='seat' onclick="send_showtime()" href="{% url "select_seat" %}" class="btn btn-primary" style="width: 100%; text-align: center;">Next</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% block extra_js %}
+
+
+
+<script>
+         var show_id = 0;
+       
+        document.getElementById('location-select').addEventListener('change', function() {
+              
+                const locationId = this.value; //Get the selected location
+                const movieId = "{{ movie.id }}"; // Get the current movie ID from context
+                const timeContainer = document.querySelector('#time-selection div');
+                const timeSelectionDiv = document.getElementById('time-selection');
+    
+                if (locationId) {
+        
+                    // Fetch showtimes from your new view
+                    fetch(`/loc/?movie_id=${movieId}&location_id=${locationId}`) //send a GET request to Django
+                        .then(response => response.json()) //Get a response from Django
+                        .then(data => { //Get the actual data
+                            // 1. Clear current buttons
+                            timeContainer.innerHTML = ''; 
+                            
+                            if (data.showtimes.length > 0) { //if there is data
+                                
+                                // 2. Loop through results and create buttons
+                                data.showtimes.forEach(st => { //for loop through the showtimes to create a button for each one
+                                    const btn = document.createElement('button'); //now create the button for each one
+                                    btn.className = 'btn btn-primary'; //give it a style (bootstrap)
+                                    btn.innerText = st.start_time; //give it the actual value to let the user see the showtimes to select one ot them 
+                                    // Optional: add a click event to store the selected time ID
+                                    btn.onclick = function() {show_id = st.id; console.log("Selected time ID:", st.id);}; 
+                                    timeContainer.appendChild(btn);
+                                });
+                                timeSelectionDiv.style.display = 'block';
+                            } else {
+                                timeContainer.innerHTML = '<p>No showtimes available for this location.</p>';
+                                timeSelectionDiv.style.display = 'block';
+                            }
+                        });
+                } else {
+                    timeSelectionDiv.style.display = 'none';
+                }
+        });
+async function send_showtime(){
+    if (show_id > 0){
+    await axios.post('http://127.0.0.1:8000/data' , show_id);
+    button.href = '{% url "select_seat" %}'
+    }else{
+        button = document.getElementById('seat');
+        button.href = '#';
+        alert("Select a location and a time first!");
+
+    }
+}
+
+
+</script>
+
+{% endblock %}
+
+{% endblock %}
+

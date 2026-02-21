@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container" style="margin-top: 50px;">
+    <h2>Available Times at {{ location.name }}</h2>
+    
+    
+    <div class="time-grid" style="display: flex; gap: 15px; margin-top: 20px;">
+        {% for showtime in showtimes %}
+            <a href="#" class="btn btn-outline-primary">
+                {{ showtime.day}}
+            </a>
+        {% endfor %}
+    </div>
+
+    
+</div>
+{% endblock %}
