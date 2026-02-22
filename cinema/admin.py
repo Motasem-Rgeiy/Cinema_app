@@ -28,13 +28,6 @@ class LocationModel(admin.ModelAdmin):
     list_per_page = 20
 
 
-
-
-
-
-
-
-
 @admin.register(models.Ticket)
 class TicketModel(admin.ModelAdmin):
     list_per_page = 20

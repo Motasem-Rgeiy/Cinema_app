@@ -12,15 +12,21 @@
         <div class="screen"></div>
         
         <!-- Rows of seats -->
+
         {% for row in rows %}
         <div class="row">
                 {% for column in columns %}
-                    <div class="seat" data-seat={{row|name}}{{column}}></div>
+                <div class="seat {% is_exist reserved_seats row column%}"  data-seat="{{row|name}}{{column}}" ></div>
+                        
+                
+                    
+
+                
                 {% endfor %}
             </div>
         
         {% endfor %}
-
+<!--  
          <div class="row">
             <div class="seat" data-seat="A1"></div>
             <div class="seat" data-seat="A2"></div>
@@ -31,7 +37,7 @@
             <div class="seat" data-seat="A7"></div>
             <div class="seat" data-seat="A8"></div>
         </div>
-  
+  -->
     </div>
 
     <div style="background-color: var(--secondary-bg); padding: 20px; border-radius: var(--border-radius); text-align: center;">
@@ -40,7 +46,7 @@
         <p>Total Amount: <span id="total-amount">$0</span></p>
         
         <div style="margin-top: 20px;">
-            <a href="/cart/" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
+            <a onclick='send_seats()' href="{% url "cart_add" %}" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
         </div>
     </div>
 </div>
@@ -53,12 +59,26 @@
     const selectedSeatsList = document.getElementById('selected-seats-list');
     const ticketPrice = 150; // Demo price
 
-    seats.forEach(seat => {
-        seat.addEventListener('click', () => {
-            seat.classList.toggle('selected');
-            updateSelection();
+   const MAX_SEATS = 2;
+
+        seats.forEach(seat => {
+            seat.addEventListener('click', () => {
+                const selectedSeats = document.querySelectorAll('.selected');
+                
+                // Check if the seat is already selected (we want to allow deselecting)
+                const isAlreadySelected = seat.classList.contains('selected');
+
+                if (!isAlreadySelected && selectedSeats.length >= MAX_SEATS) {
+                    // ACTION: What happens when they hit the limit
+                    alert("You can only select up to 2 seats!"); 
+                    // You could also trigger a modal or a shake animation here
+                } else {
+                    // Proceed with selection/deselection
+                    seat.classList.toggle('selected');
+                    updateSelection();
+                }
+            });
         });
-    });
 
     function updateSelection() {
         const selectedSeats = document.querySelectorAll('.seat.selected');
@@ -69,6 +89,17 @@
         totalAmount.innerText = '$' + (count * ticketPrice);
         selectedSeatsList.innerText = seatNames.length > 0 ? seatNames.join(', ') : 'None';
     }
+
+    async function send_seats(){
+        const selectedSeats = document.querySelectorAll('.seat.selected');
+        const seatNames = Array.from(selectedSeats).map(seat => seat.getAttribute('data-seat'));
+        await axios.post('http://127.0.0.1:8000/cart/add' , seatNames);
+       // button.href = '{% url "cart_add" %}';
+
+    }
+
+ 
+
 </script>
 {% endblock %}
 {% endblock %}

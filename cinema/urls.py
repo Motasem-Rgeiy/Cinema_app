@@ -6,7 +6,8 @@ urlpatterns = [
     path('movie/<int:mid>' , views.movieDetails , name='event_details'),
     path('data' , views.save_selected_showtime),
     path('loc/' , views.get_showtimes),
-    path('select/seat' , views.get_seats , name = 'select_seat')
+    path('select/seat' , views.get_seats , name = 'select_seat'),
+    path('cart/add' , views.cart_add , name = 'cart_add')
  
    
 ]

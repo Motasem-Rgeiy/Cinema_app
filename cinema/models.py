@@ -69,17 +69,19 @@ class Showtime(models.Model):
 #To check for available chairs
 class ShowSeat(models.Model):
     showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE)
-    location = models.TextField() #stores it manualy
     row = models.IntegerField()
     number = models.IntegerField()
 
 
-
+class TicketStatus(models.IntegerChoices):
+    RESERVED = 1 , 'reserved'
+    BOOKED = 2 , 'booked'
 
 class Ticket(models.Model):
-    number = models.IntegerField()
+    status = models.IntegerField(choices=TicketStatus.choices , default=TicketStatus.RESERVED)
     user = models.ForeignKey(User ,on_delete=models.CASCADE, null=True)
     showtime = models.ForeignKey(Showtime , on_delete=models.CASCADE)
+
 
 
 
