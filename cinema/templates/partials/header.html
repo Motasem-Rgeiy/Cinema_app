@@ -1,9 +1,14 @@
 <nav>
     <div class="nav-content">
         <a href="/" class="logo">Cinema</a>
+
+        <a href="{% url "cart_add" %}" class="btn cart-link">
+            <i class="fas fa-shopping-cart"></i> Cart
+        </a>
+
         <div class="nav-links">
             <a href="/" class="btn">Movies</a>
-             <a href="/" class="btn">Login</a>
+            <a href="/" class="btn">Login</a>
         </div>
     </div>
 </nav>

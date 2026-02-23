@@ -143,7 +143,8 @@
                                 data.showtimes.forEach(st => { //for loop through the showtimes to create a button for each one
                                     const btn = document.createElement('button'); //now create the button for each one
                                     btn.className = 'btn btn-primary'; //give it a style (bootstrap)
-                                    btn.innerText = st.start_time; //give it the actual value to let the user see the showtimes to select one ot them 
+                                    btn.innerText = st.start_time + ' ' + st.date +'\n'+ st.price + ' $' ; //give it the actual value to let the user see the showtimes to select one ot them 
+                                    
                                     // Optional: add a click event to store the selected time ID
                                     btn.onclick = function() {show_id = st.id; console.log("Selected time ID:", st.id);}; 
                                     timeContainer.appendChild(btn);

@@ -81,6 +81,7 @@ class Ticket(models.Model):
     status = models.IntegerField(choices=TicketStatus.choices , default=TicketStatus.RESERVED)
     user = models.ForeignKey(User ,on_delete=models.CASCADE, null=True)
     showtime = models.ForeignKey(Showtime , on_delete=models.CASCADE)
+    seat = models.JSONField(default=dict)
 
 
 

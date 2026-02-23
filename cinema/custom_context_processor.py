@@ -1,0 +1,19 @@
+from . import models
+
+def ticket_website(request):
+    cart = models.Cart.objects.filter(session = request.session.session_key).last()
+    ticket_ids = cart.items
+    tickets = models.Ticket.objects.filter(pk__in=ticket_ids)
+    my_tickets = []
+    total = 0
+    for ticket in tickets:
+        total +=ticket.showtime.price
+        my_tickets.append(ticket)
+
+    
+    return {'my_tickets':my_tickets , 'total':total}
+    
+
+#get all ticket ids that i reserved from the cart
+#get all showtimes of each ticket
+

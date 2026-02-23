@@ -17,5 +17,9 @@ def is_exist(reserved_seats , row , column):
             return 'occupied'
     return 
 
+def currency(price):
+    return '{:.2f}'.format(price) + ' $'
+
 
 register.filter('name', seat_number)
+register.filter('currency' , currency)
