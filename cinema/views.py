@@ -60,7 +60,9 @@ def save_selected_showtime(request):
 def get_seats(request):
      show_id = request.session.get('selected_showtime_id' , '')
      show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
-     reserved_seats = [(seat.row , seat.number) for seat in show_seats]
+     tickets = models.Ticket.objects.filter(showtime_id = show_id) #
+    # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
+     reserved_seats = [ticket.seat for ticket in tickets if ticket.seat]
      print(reserved_seats)
      if show_id:
         showtime = models.Showtime.objects.filter(pk=show_id).last()
@@ -86,19 +88,16 @@ def cart_add(request):
         print(request.session['show_seats'])
         show_id = request.session['selected_showtime_id']
         show_seats = convert_to_numeric(request.session['show_seats'])
-        showSeatList = []
+       
         tickets = []
         for seat in show_seats:
-               showSeatList.append(
-                    models.ShowSeat(row = seat[0] , number = seat[1] , showtime_id = show_id)
-                    )
                tickets.append(
                     models.Ticket(showtime_id = show_id , seat = [seat[0] , seat[1]]) #Save row and column of the chair to the ticket
                )
         
         tickets = [ticket.id for ticket in models.Ticket.objects.bulk_create(tickets)]
         
-        models.ShowSeat.objects.bulk_create(showSeatList)
+      #  models.ShowSeat.objects.bulk_create(showSeatList)
 
         cart_model = models.Cart.objects.filter(session = request.session.session_key).last()
         if cart_model is None:
@@ -110,6 +109,30 @@ def cart_add(request):
         return redirect(request.META.get('HTTP_REFERER' , '/')) 
     
     return render(request , 'cart.html')
+
+#Get the cart by session
+#Get the required ticket
+#delete the ticket
+def cart_remove(request , id):
+     session = request.session.session_key
+     if not session:
+          return JsonResponse({})
+     cart = models.Cart.objects.get(session = request.session.session_key)
+     models.Ticket.objects.filter(pk=id).delete()
+     cart.items.remove(id)
+     cart.save()
+     
+
+     return JsonResponse({'message':'The ticket has been removed' , 'status': 'ok'})
+     
+     
+     
+     
+     
+
+
+
+
 
 
 

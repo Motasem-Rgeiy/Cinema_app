@@ -11,7 +11,10 @@ def ticket_website(request):
         my_tickets.append(ticket)
 
     
-    return {'my_tickets':my_tickets , 'total':total}
+    return {
+        'my_tickets':my_tickets , 
+        'total':total , 
+        'ticket_counts': len(my_tickets)}
     
 
 #get all ticket ids that i reserved from the cart

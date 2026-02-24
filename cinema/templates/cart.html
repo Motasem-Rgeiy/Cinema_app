@@ -22,9 +22,14 @@
             </div>
             <div style="text-align: right;">
                 <p style="font-size: 1.2rem; font-weight: bold;">{{ticket.showtime.price|currency}}</p>
-                <button class="btn" style="color: #ff4b2b; padding: 0;">Remove</button>
+                <button type="button" data-url="{% url "cart_remove" ticket.id %}" class="btn" style="color: #ff4b2b; padding: 0;" onclick="cartRemove(this)">Remove</button>
             </div>
         </div>
+        {% empty %}
+            <div id="empty-cart-msg" style="text-align: center; padding: 40px;">
+                <p style="font-size: 1.2rem; color: var(--text-muted);">Your cart is empty.</p>
+                <a href="/" class="btn" style="color: #ff4b2b;">Go back to movies</a>
+            </div>
         {% endfor %}
     </div>
 
