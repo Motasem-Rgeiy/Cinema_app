@@ -17,6 +17,7 @@ class Member(models.Model):
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True)
     image = models.ImageField()
+    birthdate = models.DateField(null=True)
     role = models.ForeignKey(Role , on_delete=models.PROTECT)
 
     def __str__(self):

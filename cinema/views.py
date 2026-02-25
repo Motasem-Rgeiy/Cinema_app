@@ -5,10 +5,11 @@ from django.core.paginator import Paginator
 from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
-class EventListView(ListView):
+class EventListView(LoginRequiredMixin , ListView):
     model = models.Movie
     paginate_by = 4
     template_name = 'index.html'
@@ -29,6 +30,9 @@ def movieDetails(request , mid):
   
     return render(request , 'book/movie_details.html' , {'movie':movie , 'locations':locations})
 
+def member_details(request , id):
+     member =  models.Member.objects.filter(pk = id).last()
+     return render( request, 'member_details.html' , {'member':member})
 
 
 
@@ -49,6 +53,9 @@ def get_showtimes(request):
 def save_selected_showtime(request):
     if not request.session:
         request.session.create()
+        print(request.session.session_key , '----------')
+
+    print(request.session.session_key , '----------2')
     request.session['selected_showtime_id'] = json.loads(request.body)
     print(request.session['selected_showtime_id'] )
     
@@ -59,6 +66,7 @@ def save_selected_showtime(request):
 
 def get_seats(request):
      show_id = request.session.get('selected_showtime_id' , '')
+     print(show_id)
      show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
      tickets = models.Ticket.objects.filter(showtime_id = show_id) #
     # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
@@ -106,6 +114,8 @@ def cart_add(request):
              cart_model.items.extend(tickets)
              cart_model.save()
         
+
+        
         return redirect(request.META.get('HTTP_REFERER' , '/')) 
     
     return render(request , 'cart.html')
@@ -126,17 +136,6 @@ def cart_remove(request , id):
      return JsonResponse({'message':'The ticket has been removed' , 'status': 'ok'})
      
      
-     
-     
-     
-
-
-
-
-
-
-
-
 def convert_to_numeric(show_seats):
      new = []
      for seat in show_seats:

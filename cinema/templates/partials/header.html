@@ -1,6 +1,8 @@
+
 <nav>
     <div class="nav-content">
         <a href="/" class="logo">Cinema</a>
+        {% if user.is_authenticated %}
 
         <a href="{% url "cart_add" %}" class="btn cart-link">
             <i class="fas fa-shopping-cart"></i> Cart ({{ticket_counts}}) 
@@ -8,7 +10,12 @@
 
         <div class="nav-links">
             <a href="/" class="btn">Movies</a>
-            <a href="/" class="btn">Login</a>
+        
+           <form method="POST" action='{% url "logout" %}'>
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Log Out</button>
+            </form>
         </div>
+    {% endif %}
     </div>
 </nav>

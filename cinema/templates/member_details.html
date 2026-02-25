@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Actor Details - Cinema Booking{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px; margin-bottom: 50px;">
+    <div style="background-color: var(--secondary-bg); padding: 40px; border-radius: var(--border-radius); display: flex; gap: 40px; align-items: flex-start;">
+        
+        <!-- Actor Image (Left Side) -->
+        <div style="flex-shrink: 0;">
+            <img src="{{member.image.url}}" alt="{{member.name}}" style="width: 300px; height: 300px; border-radius: var(--border-radius); object-fit: cover; border: 3px solid var(--accent-gradient);">
+        </div>
+        
+        <!-- Actor Details (Right Side) -->
+        <div style="flex: 1;">
+            <!-- Actor Name -->
+            <h1 style="margin: 0 0 10px 0;">{{member.name}}</h1>
+            
+            <!-- Profession -->
+            <p style="color: var(--accent-gradient); font-size: 1.1rem; font-weight: bold; margin: 0 0 20px 0;">{{member.role}}</p>
+            
+            <!-- Birthdate -->
+            <div style="margin-bottom: 20px;">
+                <span style="color: var(--text-muted);">📅 Born:</span>
+                <span style="margin-left: 10px;">{{member.birthdate}}</span>
+            </div>
+            
+            <!-- Bio -->
+            <div style="line-height: 1.8;">
+                <h3 style="margin-top: 0;">Bio</h3>
+                <p style="margin: 0;">{{member.bio}}</p>
+                
+            </div>
+            
+           
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

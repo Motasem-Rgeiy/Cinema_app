@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Cinema Booking{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px; margin-bottom: 50px;">
+    <div style="max-width: 500px; margin: 0 auto; background-color: var(--secondary-bg); padding: 50px; border-radius: var(--border-radius);">
+        <h2 style="text-align: center; margin-bottom: 30px;">Login to Your Account</h2>
+        
+        <form action="{% url "login" %}" method="POST">
+            {% csrf_token %}
+            
+           
+                {% for field in form %}
+
+                 <div class="form-group">
+                        
+                
+                <label for="email">{{field.label}}</label>
+                <input type="{{field.type}}" id="{{field.id}}" name="{{field.name}}" class="form-control" required>
+            </div>
+            {% endfor %}
+            
+            
+            
+          
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">Login</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px; color: var(--text-muted);">
+            <p>Don't have an account? <a href="{% url "register" %}" style="color: var(--accent-gradient); text-decoration: none; font-weight: bold;">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

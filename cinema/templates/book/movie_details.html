@@ -49,9 +49,12 @@
 
                        
 
+                     <a href="{% url "member" member.id %}" style="text-decoration: none; color: inherit;">
+                    <div class="cast-item" style="cursor: pointer; transition: var(--transition);" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
                         <img src="{{member.image.url}}" alt="Actor 1" class="cast-img">
-
                         <p>{{member.name}}</p>
+                    </div>
+                </a>
 
                     </div>
 

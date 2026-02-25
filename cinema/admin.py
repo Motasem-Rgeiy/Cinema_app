@@ -35,3 +35,7 @@ class TicketModel(admin.ModelAdmin):
 @admin.register(models.Showtime)
 class ShowtimeModel(admin.ModelAdmin):
     list_per_page = 20
+
+@admin.register(models.Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_per_page = 20
