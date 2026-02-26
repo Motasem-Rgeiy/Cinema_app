@@ -8,6 +8,7 @@ urlpatterns = [
     path('data' , views.save_selected_showtime),
     path('loc/' , views.get_showtimes),
     path('select/seat' , views.get_seats , name = 'select_seat'),
+    path('cart', views.cart , name= 'cart'),
     path('cart/add' , views.cart_add , name = 'cart_add'),
     path('cart/remove/<int:id>', views.cart_remove , name='cart_remove'),
    

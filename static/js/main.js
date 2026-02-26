@@ -32,7 +32,7 @@ function cartRemove(button) {
         // 2. Wait 1 second so the user can see the message, then reload
         setTimeout(() => {
             window.location.reload();
-        }, 1); 
+        }, 1000); 
     })
     .catch(err => {
         console.log("Error:", err);

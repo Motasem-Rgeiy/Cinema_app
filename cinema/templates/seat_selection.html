@@ -46,7 +46,7 @@
         <p>Total Amount: <span id="total-amount">$0</span></p>
         
         <div style="margin-top: 20px;">
-            <a onclick='send_seats()' href="{% url "cart_add" %}" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
+            <a onclick='send_seats()' href="#" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
         </div>
     </div>
 </div>
@@ -90,14 +90,81 @@
         selectedSeatsList.innerText = seatNames.length > 0 ? seatNames.join(', ') : 'None';
     }
 
+
+async function send_seats() {
+    const selectedSeats = document.querySelectorAll('.seat.selected');
+    const seatNames = Array.from(selectedSeats).map(seat => seat.getAttribute('data-seat'));
+    
+    try {
+        // 1. Send the data and await the response from Django
+        const response = await axios.post('http://127.0.0.1:8000/cart/add', seatNames);
+        
+        // 2. Extract the message from the JsonResponse
+        // Axios automatically parses JSON, storing it inside the 'data' property
+        const serverMessage = response.data.message;
+        
+        // 3. Display the notification
+        showNotification(serverMessage);
+
+        if (response.data.redirect_url) {
+            setTimeout(() => {
+                window.location.href = response.data.redirect_url; //Redirect the user to the main page after it selects a seat and click "Add to cart"
+            }, 2000); 
+        }
+
+    } catch (error) {
+        console.error("Error sending seats:", error);
+        showNotification("Failed to add tickets. Please try again.", true);
+    }
+}
+
+// Helper function to handle the UI popup
+function showNotification(message, isError = false) {
+    // Create the notification element
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    
+    // Apply styling to make it look like a floating toast notification
+    Object.assign(notification.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        backgroundColor: isError ? '#f44336' : '#4CAF50', // Red for errors, green for success
+        color: 'white',
+        padding: '16px 24px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+        zIndex: '1000',
+        fontFamily: 'sans-serif',
+        opacity: '1',
+        transition: 'opacity 0.4s ease'
+    });
+
+    // Append it to the page
+    document.body.appendChild(notification);
+
+    // Remove the notification after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0'; // Fade out
+        setTimeout(() => notification.remove(), 400); // Remove from DOM after fade completes
+    }, 3000);
+}
+
+
+
+
+
+
+    /*
     async function send_seats(){
         const selectedSeats = document.querySelectorAll('.seat.selected');
         const seatNames = Array.from(selectedSeats).map(seat => seat.getAttribute('data-seat'));
         await axios.post('http://127.0.0.1:8000/cart/add' , seatNames);
+        await axios.get('http://127.0.0.1:8000/cart/add');
        // button.href = '{% url "cart_add" %}';
 
     }
-
+*/
  
 
 </script>

@@ -6,20 +6,24 @@ from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 # Create your views here.
 
-class EventListView(LoginRequiredMixin , ListView):
+class EventListView(LoginRequiredMixin,ListView):
     model = models.Movie
     paginate_by = 4
     template_name = 'index.html'
 
 #Get the required movie and all locations it is shown on to let the user select which location they want
 #then get all avaliable showtimes of the selected location
+
+@login_required
 def movieDetails(request , mid):
     movie = models.Movie.objects.filter(pk=mid).prefetch_related('members').last()
     if not movie:
-        return
+        return HttpResponse('<h1>Not Found</h1>')
     locations = []
     showtimes = models.Showtime.objects.filter(movie_id = mid)
     for showtime in showtimes:
@@ -30,12 +34,16 @@ def movieDetails(request , mid):
   
     return render(request , 'book/movie_details.html' , {'movie':movie , 'locations':locations})
 
+
+@login_required
 def member_details(request , id):
      member =  models.Member.objects.filter(pk = id).last()
+     if not member:
+          return HttpResponse('<h1>Not Found</h1>')
      return render( request, 'member_details.html' , {'member':member})
 
 
-
+@login_required
 def get_showtimes(request):
     movie_id = request.GET.get('movie_id')
     location_id = request.GET.get('location_id')
@@ -48,7 +56,7 @@ def get_showtimes(request):
 
 
 
-
+@login_required
 @csrf_exempt
 def save_selected_showtime(request):
     if not request.session:
@@ -63,10 +71,12 @@ def save_selected_showtime(request):
 
 
 
-
+@login_required
 def get_seats(request):
      show_id = request.session.get('selected_showtime_id' , '')
-     print(show_id)
+     if not show_id:
+          return HttpResponse('<h1>Select a showtime first!</h1>')
+     print(show_id , '--------------')
      show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
      tickets = models.Ticket.objects.filter(showtime_id = show_id) #
     # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
@@ -86,7 +96,12 @@ def get_seats(request):
                                                     'reserved_seats': reserved_seats
                                             })
 
+@login_required
+def cart(request):
+     return render(request , 'cart.html')
 
+
+@login_required
 @csrf_exempt
 def cart_add(request):
     if request.method == 'POST':
@@ -95,39 +110,43 @@ def cart_add(request):
         request.session['show_seats'] =  json.loads(request.body)
         print(request.session['show_seats'])
         show_id = request.session['selected_showtime_id']
+        del request.session['selected_showtime_id']
         show_seats = convert_to_numeric(request.session['show_seats'])
        
         tickets = []
         for seat in show_seats:
                tickets.append(
-                    models.Ticket(showtime_id = show_id , seat = [seat[0] , seat[1]]) #Save row and column of the chair to the ticket
+                    models.Ticket(showtime_id = show_id , seat = [seat[0] , seat[1]] , user_id = request.user.id) #Save row and column of the chair to the ticket
                )
         
         tickets = [ticket.id for ticket in models.Ticket.objects.bulk_create(tickets)]
         
       #  models.ShowSeat.objects.bulk_create(showSeatList)
 
-        cart_model = models.Cart.objects.filter(session = request.session.session_key).last()
+        cart_model = models.Cart.objects.filter(user = request.user.id).last()
         if cart_model is None:
-             cart_model =  models.Cart.objects.create(session_id = request.session.session_key , items = tickets)
+             cart_model =  models.Cart.objects.create(user_id = request.user.id , items = tickets)
         else:
              cart_model.items.extend(tickets)
              cart_model.save()
         
-
-        
-        return redirect(request.META.get('HTTP_REFERER' , '/')) 
+        return JsonResponse({
+             'message':"This ticket has been added successfully",
+             'redirect_url':reverse('event_list')
+             })       
+ 
+   
     
-    return render(request , 'cart.html')
 
 #Get the cart by session
 #Get the required ticket
 #delete the ticket
+@login_required
 def cart_remove(request , id):
      session = request.session.session_key
      if not session:
           return JsonResponse({})
-     cart = models.Cart.objects.get(session = request.session.session_key)
+     cart = models.Cart.objects.get(user = request.user.id)
      models.Ticket.objects.filter(pk=id).delete()
      cart.items.remove(id)
      cart.save()

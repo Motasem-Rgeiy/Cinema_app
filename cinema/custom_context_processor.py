@@ -4,7 +4,7 @@ def ticket_website(request):
 
     my_tickets = []
     total = 0
-    cart = models.Cart.objects.filter(session = request.session.session_key).last()
+    cart = models.Cart.objects.filter(user = request.user.id).last()
     if cart and cart.items:
         ticket_ids = cart.items
         tickets = models.Ticket.objects.filter(pk__in=ticket_ids)

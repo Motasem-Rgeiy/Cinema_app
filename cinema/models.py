@@ -94,5 +94,6 @@ class Order(models.Model):
 
 
 class Cart(models.Model):
-    session = models.ForeignKey(Session , on_delete=models.CASCADE)
+   # session = models.ForeignKey(Session , on_delete=models.CASCADE)
+    user = models.ForeignKey(User , on_delete=models.CASCADE)
     items = models.JSONField(default=dict)
