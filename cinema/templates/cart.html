@@ -33,9 +33,15 @@
         {% endfor %}
     </div>
 
+    {% if ticket_counts > 0 %}
+    
+    
+  
+
     <div style="margin-top: 30px; text-align: right; background-color: var(--secondary-bg); padding: 20px; border-radius: var(--border-radius);">
         <h3>Total: {{total|currency}}</h3>
-        <a href="/payment/" class="btn btn-primary" style="margin-top: 10px;">Proceed to Payment</a>
+        <a href="{% url "checkout" %}" class="btn btn-primary" style="margin-top: 10px;">Proceed to Payment</a>
     </div>
+      {% endif %}
 </div>
 {% endblock %}

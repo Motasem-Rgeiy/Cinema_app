@@ -1,5 +1,5 @@
 from django.shortcuts import render , redirect
-from django.http import HttpResponse , JsonResponse
+from django.http import HttpResponse , JsonResponse , FileResponse
 from . import models
 from django.core.paginator import Paginator
 from django.views.generic import ListView
@@ -8,6 +8,12 @@ import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+import secrets
+from .helper import ticket_generation_pdf , convert_to_numeric
+from django.template.loader import render_to_string
+from django.core.mail import send_mail 
+
+
 
 # Create your views here.
 
@@ -116,7 +122,7 @@ def cart_add(request):
         tickets = []
         for seat in show_seats:
                tickets.append(
-                    models.Ticket(showtime_id = show_id , seat = [seat[0] , seat[1]] , user_id = request.user.id) #Save row and column of the chair to the ticket
+                    models.Ticket(showtime_id = show_id , seat = [seat[0] , seat[1]] , user_id = request.user.id , code = secrets.token_urlsafe(8)) #Save row and column of the chair to the ticket
                )
         
         tickets = [ticket.id for ticket in models.Ticket.objects.bulk_create(tickets)]
@@ -133,7 +139,8 @@ def cart_add(request):
         return JsonResponse({
              'message':"This ticket has been added successfully",
              'redirect_url':reverse('event_list')
-             })       
+             })   
+    return redirect('/')    
  
    
     
@@ -148,6 +155,8 @@ def cart_remove(request , id):
           return JsonResponse({})
      cart = models.Cart.objects.get(user = request.user.id)
      models.Ticket.objects.filter(pk=id).delete()
+     if id not in cart.items:
+          return HttpResponse('<h1>No Found</h1>')
      cart.items.remove(id)
      cart.save()
      
@@ -155,9 +164,65 @@ def cart_remove(request , id):
      return JsonResponse({'message':'The ticket has been removed' , 'status': 'ok'})
      
      
-def convert_to_numeric(show_seats):
-     new = []
-     for seat in show_seats:
-          row = ord(seat[0]) -  65  + 1
-          new.append((row , int(seat[1])))
-     return new
+
+
+
+def make_order(request):
+     if request.method == 'POST':
+          email = request.POST['email']
+          first_name = request.POST['first_name']
+          last_name = request.POST['last_name']
+          customer = {
+                        'email':email ,
+                        'first_name':first_name,
+                        'last_name':last_name,
+                        }
+          
+          total = 0
+          cart_model = models.Cart.objects.filter(user = request.user).last()
+          tickets = models.Ticket.objects.filter(pk__in = cart_model.items)
+          for ticket in tickets:
+               total+=ticket.showtime.price
+               ticket_generation_pdf(ticket)
+               print(ticket.pdf_file.url)
+          
+          order = models.Order.objects.create(customer = customer , total = total)
+          models.Cart.objects.filter(user = request.user).delete()
+          order_mail(tickets , order)
+          return render(request , 'confirmation.html')
+                       
+
+     else:
+          credentials = {}
+          if request.user.is_authenticated:
+               credentials = {
+                    'first_name':request.user.first_name,
+                    'last_name':request.user.last_name ,
+                    'email': request.user.email ,
+                    'password': request.user.password,
+               }
+          print('Yes')
+          return render(request , 'payment.html' , {'credentials':credentials})
+    
+
+def order_mail(tickets_obj , order_obj):
+     html_msg = render_to_string('emails/order.html',
+                                 {'tickets':tickets_obj, 'order':order_obj}
+                                       )
+     
+     send_mail(subject='Order Completed',
+               html_message=html_msg,
+               message=html_msg,
+               from_email='motasem@example.com',
+               recipient_list=[order_obj.customer['email']]
+
+               )
+
+
+
+
+
+
+
+
+

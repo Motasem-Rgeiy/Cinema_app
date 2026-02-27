@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load my_filters %}
 
 {% block title %}Payment - Cinema Booking{% endblock %}
 
@@ -8,30 +9,31 @@
     <div style="background-color: var(--secondary-bg); padding: 40px; border-radius: var(--border-radius);">
         <h2 style="text-align: center; margin-bottom: 30px;">Payment Details</h2>
         
-        <form action="/confirmation/" method="GET">
+        <form action="{% url "checkout" %}" method="POST">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="example@mail.com" required>
+                <input type="email" id="email" name="email" class="form-control" value="{{credentials.email}}" placeholder="example@mail.com" required>
             </div>
             
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
                     <label for="first_name">First Name</label>
-                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" required>
+                    <input type="text" id="first_name" value="{{credentials.first_name}}" name="first_name" class="form-control" placeholder="Enter first Name" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label for="last_name">Last Name</label>
-                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Doe" required>
+                    <input type="text" id="last_name" value="{{credentials.last_name}}" name="last_name" class="form-control" placeholder="Enter Last Name" required>
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="password">Password (for account creation)</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="********" required>
+                <input type="password" id="password"  name="password" class="form-control" placeholder="********" required>
             </div>
 
             <div style="margin-top: 30px;">
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Pay $300 Now</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Pay {{total|currency}} Now</button>
             </div>
         </form>
     </div>

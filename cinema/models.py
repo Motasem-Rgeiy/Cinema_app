@@ -79,7 +79,9 @@ class TicketStatus(models.IntegerChoices):
     BOOKED = 2 , 'booked'
 
 class Ticket(models.Model):
+    code = models.CharField(max_length=20 , unique=True , null=True)
     status = models.IntegerField(choices=TicketStatus.choices , default=TicketStatus.RESERVED)
+    pdf_file = models.FileField(blank=True , null=True)
     user = models.ForeignKey(User ,on_delete=models.CASCADE, null=True)
     showtime = models.ForeignKey(Showtime , on_delete=models.CASCADE)
     seat = models.JSONField(default=dict)
@@ -90,6 +92,13 @@ class Ticket(models.Model):
 class Order(models.Model):
     total = models.FloatField()
     customer = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True , null=True)
+    updated_at = models.DateTimeField(auto_now=True , null=True)
+
+    @property
+    def customer_name(self):
+        return f"{self.customer['first_name']} {self.customer['last_name']}"
+
 
 
 

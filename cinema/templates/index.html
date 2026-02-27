@@ -15,7 +15,7 @@
     <div class="movie-grid">
         <!-- Static Demo Cards -->
           {% for movie in page_obj %}
-        <div class="movie-card" onclick="location.href='/movie/1/'">
+        <div class="movie-card" onclick="location.href='{% url "event_details" movie.id %}">
            
                     
            
