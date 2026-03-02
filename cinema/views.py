@@ -1,7 +1,6 @@
 from django.shortcuts import render , redirect
-from django.http import HttpResponse , JsonResponse , FileResponse
+from django.http import HttpResponse , JsonResponse
 from . import models
-from django.core.paginator import Paginator
 from django.views.generic import ListView
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -12,6 +11,7 @@ import secrets
 from .helper import ticket_generation_pdf , convert_to_numeric
 from django.template.loader import render_to_string
 from django.core.mail import send_mail 
+from .templatetags.my_filters import seat_number
 
 
 
@@ -32,11 +32,15 @@ def movieDetails(request , mid):
         return HttpResponse('<h1>Not Found</h1>')
     locations = []
     showtimes = models.Showtime.objects.filter(movie_id = mid)
-    for showtime in showtimes:
+ 
+    locations = models.Location.objects.filter(pk__in=[loc.location_id for loc in showtimes])
+ 
+    
+ #   for showtime in showtimes:
 
-                location = models.Location.objects.filter(pk=showtime.location_id).last()
-                if location not in locations:
-                     locations.append(location)
+     #           location = models.Location.objects.filter(pk=showtime.location_id).last()
+      #          if location not in locations:
+  #                   locations.append(location)
   
     return render(request , 'book/movie_details.html' , {'movie':movie , 'locations':locations})
 
@@ -65,42 +69,48 @@ def get_showtimes(request):
 @login_required
 @csrf_exempt
 def save_selected_showtime(request):
+   
     if not request.session:
         request.session.create()
-        print(request.session.session_key , '----------')
-
-    print(request.session.session_key , '----------2')
+       
     request.session['selected_showtime_id'] = json.loads(request.body)
-    print(request.session['selected_showtime_id'] )
+    print('Second', request.session['selected_showtime_id'])
+  
     
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return JsonResponse({'status': 'success', 'redirect_url': '/select/seat'})
 
 
 
 @login_required
+@csrf_exempt
 def get_seats(request):
      show_id = request.session.get('selected_showtime_id' , '')
      if not show_id:
-          return HttpResponse('<h1>Select a showtime first!</h1>')
-     print(show_id , '--------------')
+               return HttpResponse('<h1>Select a showtime first!</h1>')
+          
      show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
      tickets = models.Ticket.objects.filter(showtime_id = show_id) #
-    # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
+          # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
      reserved_seats = [ticket.seat for ticket in tickets if ticket.seat]
-     print(reserved_seats)
+          
      if show_id:
-        showtime = models.Showtime.objects.filter(pk=show_id).last()
-        rows = range(1 , showtime.seat_row + 1)
-        columns = range(1 , showtime.seat_column + 1)
+          showtime = models.Showtime.objects.filter(pk=show_id).last()
+          rows = range(1 , showtime.seat_row + 1)
+          columns = range(1 , showtime.seat_column + 1)
      else:
-        rows = (1,)
-        columns = (1,)
+           rows = (1,)
+           columns = (1,)
+               
+          
+    
      return render(request , 'seat_selection.html', {'rows':rows,
-                                                    'columns':columns ,
-                                                    'showtime':showtime , 
-                                                    'show_seats':show_seats,
-                                                    'reserved_seats': reserved_seats
-                                            })
+                                                       'columns':columns ,
+                                                       'showtime':showtime , 
+                                                       'show_seats':show_seats,
+                                                       'reserved_seats': reserved_seats
+                                             })
+
+
 
 @login_required
 def cart(request):
@@ -114,7 +124,7 @@ def cart_add(request):
         if not request.session:
                request.session.create()
         request.session['show_seats'] =  json.loads(request.body)
-        print(request.session['show_seats'])
+       
         show_id = request.session['selected_showtime_id']
         del request.session['selected_showtime_id']
         show_seats = convert_to_numeric(request.session['show_seats'])
@@ -183,13 +193,14 @@ def make_order(request):
           tickets = models.Ticket.objects.filter(pk__in = cart_model.items)
           for ticket in tickets:
                total+=ticket.showtime.price
+               ticket.status = 2
                ticket_generation_pdf(ticket)
-               print(ticket.pdf_file.url)
+               
           
           order = models.Order.objects.create(customer = customer , total = total)
           models.Cart.objects.filter(user = request.user).delete()
           order_mail(tickets , order)
-          return render(request , 'confirmation.html')
+          return render(request , 'confirmation.html' ,{'order':order})
                        
 
      else:
@@ -201,7 +212,7 @@ def make_order(request):
                     'email': request.user.email ,
                     'password': request.user.password,
                }
-          print('Yes')
+         
           return render(request , 'payment.html' , {'credentials':credentials})
     
 
@@ -219,10 +230,91 @@ def order_mail(tickets_obj , order_obj):
                )
 
 
+def userDashboard(request):
+     tickets = models.Ticket.objects.filter(user = request.user).order_by('-updated_at').select_related('showtime')
+     showtimes = {}
+
+
+ #    for ticket in tickets:
+
+    #      if ticket.showtime not in showtimes:
+       #        showtimes[ticket.showtime] = [f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"]
+         #     continue
+       # 
+        #  showtimes[ticket.showtime].append(f"{seat_number(ticket.seat[0])}{ticket.seat[1]}")
+     
+     dash = []
+     
+     for ticket in tickets:
+          if dash:
+               is_exist = False
+               for j , row in enumerate(dash):
+                    if row['show'] == ticket.showtime and row['status'] == ticket.get_status_display():
+                         dash[j]['seat'].append(f"{seat_number(ticket.seat[0])}{ticket.seat[1]}")
+                         is_exist = True
+                         break
+                        
+               if not is_exist:
+                         dash.append(
+               {'show':ticket.showtime , 'status':ticket.get_status_display() , 'seat':[f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"], 'updated_at':ticket.updated_at}
+                    )
+                       
+                    
+          else:
+               dash.append(
+               {'show':ticket.showtime , 'status':ticket.get_status_display() , 'seat':[f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"],'updated_at':ticket.updated_at}
+                    )
+    
+             
+         
+     '''
+          if dash:
+           
+               for j,row in enumerate(dash):
+                    print(row['show'] , ticket.showtime_id , '----' , row['status'] , ticket.status)
+                  
+                    
+                   
+                    if row['show'] == ticket.showtime_id and row['status'] == ticket.status:
+                         print(True)
+                   
+                 
+
+          else:
+     
+               dash.append(
+                    {'show':ticket.showtime_id , 'status':ticket.status , 'seat':[f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"]}
+               )
+     
+    '''
+   
+          
+              
+
+    
+               
+   
+                     
+        
+    
+
+   #  s = {}
+
+    # for show , seats in showtimes.items():
+         
+     #     s[show.ticket_set.all()[0]] = seats
+     
+
+    
+
+
+
+     return render(request , 'dasboard.html' , {  'tickets':dash})
 
 
 
 
-
-
-
+'''maybe used later
+ from django.db.models import Avg
+ Book.objects.aggregate(Avg("price", default=0))
+'''

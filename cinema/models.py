@@ -77,6 +77,8 @@ class ShowSeat(models.Model):
 class TicketStatus(models.IntegerChoices):
     RESERVED = 1 , 'reserved'
     BOOKED = 2 , 'booked'
+    COMPLETED = 3 , 'completed'
+    CANCELED = 4 , 'canceled'
 
 class Ticket(models.Model):
     code = models.CharField(max_length=20 , unique=True , null=True)
@@ -85,6 +87,8 @@ class Ticket(models.Model):
     user = models.ForeignKey(User ,on_delete=models.CASCADE, null=True)
     showtime = models.ForeignKey(Showtime , on_delete=models.CASCADE)
     seat = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True , null=True)
+    updated_at = models.DateTimeField(auto_now=True , null=True)
 
 
 

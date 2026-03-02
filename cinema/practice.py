@@ -1,10 +1,5 @@
-from reportlab.pdfgen import canvas
-import io
+s = [1 , 2]
 
-p = canvas.Canvas('hello.pdf')
-
-p.drawString(100 , 100 , 'Hello, i am here')
-
-p.showPage()
-
-p.save()
+d = [s]
+d.append([1])
+print(d)

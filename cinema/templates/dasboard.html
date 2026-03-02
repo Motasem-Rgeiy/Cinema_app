@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load static my_filters %}
+
+{% block content %}
+<style>
+    .bookings-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: #1a1a1a;
+        color: #ffffff;
+        min-height: 100vh;
+    }
+
+    .bookings-container h1 {
+        font-size: 32px;
+        margin-bottom: 30px;
+        color: #FF1493;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #2a2a2a;
+        border-radius: 8px;
+    }
+
+    .empty-state h2 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #ffffff;
+    }
+
+    .empty-state p {
+        color: #999;
+        margin-bottom: 20px;
+    }
+
+    .btn-primary {
+        background: #FF1493;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary:hover {
+        background: #FF6B6B;
+    }
+
+    .bookings-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #2a2a2a;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .bookings-table th {
+        background: #1a1a1a;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #999;
+        font-size: 13px;
+        border-bottom: 1px solid #3a3a3a;
+    }
+
+    .bookings-table td {
+        padding: 15px;
+        border-bottom: 1px solid #3a3a3a;
+        color: #e0e0e0;
+    }
+
+    .bookings-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .bookings-table tr:hover {
+        background: #333333;
+    }
+
+    .movie-title {
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .showtime {
+        color: #FF1493;
+        font-weight: 600;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    .status-confirmed {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+    }
+
+    .status-pending {
+        background: rgba(255, 152, 0, 0.2);
+        color: #ff9800;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-small {
+        padding: 6px 12px;
+        border: 1px solid #3a3a3a;
+        background: transparent;
+        color: #FF1493;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .btn-small:hover {
+        background: #FF1493;
+        color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        .bookings-container {
+            padding: 20px 15px;
+        }
+
+        .bookings-container h1 {
+            font-size: 24px;
+        }
+
+        .bookings-table th, .bookings-table td {
+            padding: 12px 10px;
+            font-size: 13px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-small {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+
+
+<div class="bookings-container">
+    <h1>My Bookings</h1>
+
+    {% if tickets %}
+    <div id="tableSection">
+        <table class="bookings-table">
+            <thead>
+                <tr>
+                    <th>Movie</th>
+                    <th>Date & Time</th>
+                    <th>Location</th>
+                    <th>Seat</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Updated at</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td class="movie-title">{{ ticket.show.movie.name }}</td>
+                    <td><span class="showtime">{{ ticket.show.date }} {{ ticket.show.start_time }}</span></td>
+                    <td>{{ ticket.show.location.city }}</td>
+                    <td> 
+                        {% for s in ticket.seat %}
+                        {{s}},
+
+                        {% endfor %}
+                        
+                    </td>
+                    
+                    <td><span class="status status-{{ ticket.status|lower }}">{{ ticket.status }}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'event_details' ticket.show.movie.id %}" class="btn-small">View</a>
+                           
+                        </div>
+                    </td>
+                    <td> {{ticket.updated_at}} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div id="emptyState" class="empty-state">
+        <h2>No Bookings Yet</h2>
+        <p>You haven't booked any showtimes</p>
+       
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

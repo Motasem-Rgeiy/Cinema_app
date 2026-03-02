@@ -106,7 +106,7 @@
 
             <div style="margin-top: 30px;">
 
-                <a id='seat' onclick="send_showtime()" href="{% url "select_seat" %}" class="btn btn-primary" style="width: 100%; text-align: center;">Next</a>
+                <button id='seat' onclick="send_showtime()"class="btn btn-primary" style="width: 100%; text-align: center;">Next</button>
 
             </div>
 
@@ -164,13 +164,22 @@
         });
 async function send_showtime(){
     if (show_id > 0){
-    await axios.post('http://127.0.0.1:8000/data' , show_id);
-    button.href = '{% url "select_seat" %}'
+   
+    //await axios.post('http://127.0.0.1:8000/data' , show_id); 
+    //await axios.get('/select/seat' , show_id);
+
+    const response = await axios.post('/data', show_id);
+if (response.data.status === 'success') {
+    window.location.href = response.data.redirect_url;
+}
+     
+    
+    
     }else{
         button = document.getElementById('seat');
         button.href = '#';
         alert("Select a location and a time first!");
-
+    
     }
 }
 

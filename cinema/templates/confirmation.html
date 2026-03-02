@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load my_filters %}
 
 {% block title %}Booking Confirmed - Cinema Booking{% endblock %}
 
@@ -12,12 +13,12 @@
         
         <div style="text-align: left; border-top: 1px solid #444; padding-top: 30px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <span>Movie Name:</span>
-                <span style="font-weight: bold;">Interstellar</span>
+        <!--           <span>Movie Name:</span> -->  
+       <!--        <span style="font-weight: bold;">Interstellar</span> -->   
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <span>User Name:</span>
-                <span style="font-weight: bold;">John Doe</span>
+                <span style="font-weight: bold;">{{order.customer_name}}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <span>Payment Method:</span>
@@ -25,7 +26,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem;">
                 <span>Total Amount:</span>
-                <span style="font-weight: bold; color: #ff4b2b;">$300</span>
+                <span style="font-weight: bold; color: #ff4b2b;">{{order.total|currency}}</span>
             </div>
         </div>
 
