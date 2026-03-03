@@ -167,7 +167,7 @@
 <div class="bookings-container">
     <h1>My Bookings</h1>
 
-    {% if tickets %}
+    {% if dashboard %}
     <div id="tableSection">
         <table class="bookings-table">
             <thead>
@@ -182,14 +182,14 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ticket in tickets %}
+                {% for ticket in dashboard %}
                 <tr>
                     <td class="movie-title">{{ ticket.show.movie.name }}</td>
                     <td><span class="showtime">{{ ticket.show.date }} {{ ticket.show.start_time }}</span></td>
                     <td>{{ ticket.show.location.city }}</td>
                     <td> 
                         {% for s in ticket.seat %}
-                        {{s}},
+                        {{s}} 
 
                         {% endfor %}
                         

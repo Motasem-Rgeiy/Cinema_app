@@ -22,6 +22,15 @@ class EventListView(LoginRequiredMixin,ListView):
     paginate_by = 4
     template_name = 'index.html'
 
+    def get_queryset(self):
+         movies = models.Movie.objects.filter(showtime__status=models.ShowtimeStatus.OPEN).select_related('category').distinct()
+         return movies
+        
+        
+   
+        
+         
+
 #Get the required movie and all locations it is shown on to let the user select which location they want
 #then get all avaliable showtimes of the selected location
 
@@ -31,6 +40,7 @@ def movieDetails(request , mid):
     if not movie:
         return HttpResponse('<h1>Not Found</h1>')
     locations = []
+
     showtimes = models.Showtime.objects.filter(movie_id = mid)
  
     locations = models.Location.objects.filter(pk__in=[loc.location_id for loc in showtimes])
@@ -47,7 +57,7 @@ def movieDetails(request , mid):
 
 @login_required
 def member_details(request , id):
-     member =  models.Member.objects.filter(pk = id).last()
+     member =  models.Member.objects.filter(pk = id).select_related('role').last()
      if not member:
           return HttpResponse('<h1>Not Found</h1>')
      return render( request, 'member_details.html' , {'member':member})
@@ -57,7 +67,7 @@ def member_details(request , id):
 def get_showtimes(request):
     movie_id = request.GET.get('movie_id')
     location_id = request.GET.get('location_id')
-    showtimes = models.Showtime.objects.filter(movie_id = movie_id , location = location_id)
+    showtimes = models.Showtime.objects.filter(movie_id = movie_id , location = location_id , status = models.ShowtimeStatus.OPEN)
     
     data = []
     for show in showtimes:
@@ -231,17 +241,8 @@ def order_mail(tickets_obj , order_obj):
 
 
 def userDashboard(request):
-     tickets = models.Ticket.objects.filter(user = request.user).order_by('-updated_at').select_related('showtime')
-     showtimes = {}
-
-
- #    for ticket in tickets:
-
-    #      if ticket.showtime not in showtimes:
-       #        showtimes[ticket.showtime] = [f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"]
-         #     continue
-       # 
-        #  showtimes[ticket.showtime].append(f"{seat_number(ticket.seat[0])}{ticket.seat[1]}")
+     tickets = models.Ticket.objects.filter(user = request.user).select_related('showtime')
+ 
      
      dash = []
      
@@ -264,52 +265,10 @@ def userDashboard(request):
                dash.append(
                {'show':ticket.showtime , 'status':ticket.get_status_display() , 'seat':[f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"],'updated_at':ticket.updated_at}
                     )
-    
-             
-         
-     '''
-          if dash:
-           
-               for j,row in enumerate(dash):
-                    print(row['show'] , ticket.showtime_id , '----' , row['status'] , ticket.status)
-                  
-                    
-                   
-                    if row['show'] == ticket.showtime_id and row['status'] == ticket.status:
-                         print(True)
-                   
-                 
-
-          else:
-     
-               dash.append(
-                    {'show':ticket.showtime_id , 'status':ticket.status , 'seat':[f"{seat_number(ticket.seat[0])}{ticket.seat[1]}"]}
-               )
-     
-    '''
-   
-          
-              
-
-    
                
-   
-                     
-        
+     dash = sorted(dash , key = lambda row: row['updated_at'] , reverse=True)
     
-
-   #  s = {}
-
-    # for show , seats in showtimes.items():
-         
-     #     s[show.ticket_set.all()[0]] = seats
-     
-
-    
-
-
-
-     return render(request , 'dasboard.html' , {  'tickets':dash})
+     return render(request , 'dasboard.html' , {  'dashboard':dash})
 
 
 

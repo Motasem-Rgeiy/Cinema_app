@@ -51,7 +51,11 @@ class Location(models.Model):
     def __str__(self):
         return self.city
 
-
+class ShowtimeStatus(models.IntegerChoices):
+    OPEN = 1 , 'open'
+    RUNNING = 2 , 'running'
+    FINISHED = 3 , 'finished'
+    CANCELLED = 4 , 'cancelled'
 
 class Showtime(models.Model):
     date = models.DateField()
@@ -59,11 +63,12 @@ class Showtime(models.Model):
     price = models.FloatField()
     seat_row = models.IntegerField(null=True)
     seat_column = models.IntegerField(null=True)
+    status = models.IntegerField(choices=ShowtimeStatus.choices , default=ShowtimeStatus.OPEN)
     movie = models.ForeignKey(Movie , on_delete=models.CASCADE , null=True)
     location = models.ForeignKey(Location , on_delete=models.PROTECT)
 
     def __str__(self):
-        return str(self.start_time)
+        return str(self.start_time) + ' ' +  self.movie.name
 
 
 
@@ -78,7 +83,7 @@ class TicketStatus(models.IntegerChoices):
     RESERVED = 1 , 'reserved'
     BOOKED = 2 , 'booked'
     COMPLETED = 3 , 'completed'
-    CANCELED = 4 , 'canceled'
+    CANCELLED = 4 , 'cancelled'
 
 class Ticket(models.Model):
     code = models.CharField(max_length=20 , unique=True , null=True)
