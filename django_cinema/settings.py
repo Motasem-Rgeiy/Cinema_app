@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'cinema',
     'accounts',
     "debug_toolbar",
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +144,9 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+
+Q_CLUSTER = {
+    'name': 'CinemaProject',
+    'orm': 'default',  # This tells it to use your Django DB
+}

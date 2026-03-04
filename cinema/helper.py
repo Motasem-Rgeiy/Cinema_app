@@ -5,9 +5,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from .templatetags.my_filters import seat_number
-from . import models
-import datetime
-from datetime import date , time
+
 
 
 def ticket_generation_pdf(ticket_obj):

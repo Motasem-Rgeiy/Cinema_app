@@ -12,6 +12,8 @@ from .helper import ticket_generation_pdf , convert_to_numeric
 from django.template.loader import render_to_string
 from django.core.mail import send_mail 
 from .templatetags.my_filters import seat_number
+from datetime import datetime
+from django.db.models import Q
 
 
 
@@ -23,7 +25,10 @@ class EventListView(LoginRequiredMixin,ListView):
     template_name = 'index.html'
 
     def get_queryset(self):
-         movies = models.Movie.objects.filter(showtime__status=models.ShowtimeStatus.OPEN).select_related('category').distinct()
+         movies = models.Movie.objects.filter(
+              Q(showtime__status=models.ShowtimeStatus.OPEN)|(
+                   Q(showtime__status=models.ShowtimeStatus.RUNNING))
+         ).select_related('category').distinct()
          return movies
         
         
@@ -67,11 +72,13 @@ def member_details(request , id):
 def get_showtimes(request):
     movie_id = request.GET.get('movie_id')
     location_id = request.GET.get('location_id')
-    showtimes = models.Showtime.objects.filter(movie_id = movie_id , location = location_id , status = models.ShowtimeStatus.OPEN)
-    
+    showtimes = models.Showtime.objects.filter(movie_id = movie_id , location = location_id , status__in=[models.ShowtimeStatus.OPEN , models.ShowtimeStatus.RUNNING])
+    print(showtimes)
     data = []
+    #Doing status different cases!
     for show in showtimes:
-        data.append({'id':show.id , 'start_time':show.start_time , 'date':show.date , 'price':show.price})
+        data.append({'id':show.id , 'start_time':show.start_time , 'date':show.date , 'price':show.price , 'status':show.status})
+    
     return JsonResponse({'showtimes':data})
 
 
@@ -271,6 +278,26 @@ def userDashboard(request):
      return render(request , 'dasboard.html' , {  'dashboard':dash})
 
 
+#RunTime <class 'datetime.timedelta'>
+#startTime <class 'datetime.time'>
+from datetime import date
+from datetime import time , timedelta
+
+
+def showtime_processing(request):
+     movies = models.Movie.objects.all()
+     for movie in movies:
+          for showtime in movie.showtime_set.all():
+
+               start_datetime = datetime.fromisoformat(f"{str(showtime.date)} {str(showtime.start_time)}")
+               current_datetime = datetime.today()
+               if start_datetime == current_datetime:
+                    pass
+     
+
+ 
+     
+     return HttpResponse('Done')
 
 
 '''maybe used later
