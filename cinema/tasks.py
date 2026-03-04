@@ -1,5 +1,4 @@
-from django.utils import timezone
-from .models import Showtime , Movie , ShowtimeStatus , TicketStatus , Cart
+from .models import Showtime , ShowtimeStatus , TicketStatus 
 from datetime import datetime
 
 def showtime_processing():
@@ -14,11 +13,13 @@ def showtime_processing():
                 if current_datetime >= end_time and showtime.status == ShowtimeStatus.RUNNING:
                       showtime.status = ShowtimeStatus.FINISHED
                       for ticket in showtime.ticket_set.all():
-                              ticket.status = TicketStatus.COMPLETED
+                              if ticket.status == TicketStatus.BOOKED:
+                                   ticket.status = TicketStatus.COMPLETED
+                              elif ticket.status == TicketStatus.RESERVED:
+                                     ticket.status = TicketStatus.CANCELLED
                               ticket.save()
                             
                       showtime.save()
-                      print('Yes')
                       continue
                 if current_datetime >= start_datetime and showtime.status == ShowtimeStatus.OPEN:
                         showtime.status = ShowtimeStatus.RUNNING

@@ -12,7 +12,6 @@ from .helper import ticket_generation_pdf , convert_to_numeric
 from django.template.loader import render_to_string
 from django.core.mail import send_mail 
 from .templatetags.my_filters import seat_number
-from datetime import datetime
 from django.db.models import Q
 
 
@@ -106,17 +105,20 @@ def get_seats(request):
                return HttpResponse('<h1>Select a showtime first!</h1>')
           
      show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
-     tickets = models.Ticket.objects.filter(showtime_id = show_id) #
+     tickets = models.Ticket.objects.filter(showtime_id = show_id , status__in=[models.TicketStatus.BOOKED , models.TicketStatus.RESERVED]) #
           # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
      reserved_seats = [ticket.seat for ticket in tickets if ticket.seat]
           
-     if show_id:
-          showtime = models.Showtime.objects.filter(pk=show_id).last()
-          rows = range(1 , showtime.seat_row + 1)
-          columns = range(1 , showtime.seat_column + 1)
-     else:
-           rows = (1,)
-           columns = (1,)
+    
+     showtime = models.Showtime.objects.filter(pk=show_id).last()
+
+     if showtime.status == models.ShowtimeStatus.FINISHED or showtime.status == models.ShowtimeStatus.CANCELLED:
+               return HttpResponse('<h1>Not Available</h1>')
+     
+     rows = range(1 , showtime.seat_row + 1)
+     columns = range(1 , showtime.seat_column + 1)
+   
+    
                
           
     
@@ -280,24 +282,6 @@ def userDashboard(request):
 
 #RunTime <class 'datetime.timedelta'>
 #startTime <class 'datetime.time'>
-from datetime import date
-from datetime import time , timedelta
-
-
-def showtime_processing(request):
-     movies = models.Movie.objects.all()
-     for movie in movies:
-          for showtime in movie.showtime_set.all():
-
-               start_datetime = datetime.fromisoformat(f"{str(showtime.date)} {str(showtime.start_time)}")
-               current_datetime = datetime.today()
-               if start_datetime == current_datetime:
-                    pass
-     
-
- 
-     
-     return HttpResponse('Done')
 
 
 '''maybe used later

@@ -26,24 +26,13 @@
             </div>
         
         {% endfor %}
-<!--  
-         <div class="row">
-            <div class="seat" data-seat="A1"></div>
-            <div class="seat" data-seat="A2"></div>
-            <div class="seat occupied"></div>
-            <div class="seat" data-seat="A4"></div>
-            <div class="seat" data-seat="A5"></div>
-            <div class="seat" data-seat="A6"></div>
-            <div class="seat" data-seat="A7"></div>
-            <div class="seat" data-seat="A8"></div>
-        </div>
-  -->
+
     </div>
 
     <div style="background-color: var(--secondary-bg); padding: 20px; border-radius: var(--border-radius); text-align: center;">
         <p>Selected Seats: <span id="selected-seats-list">None</span></p>
         <p>Total Tickets: <span id="total-tickets">0</span></p>
-        <p>Total Amount: <span id="total-amount">$0</span></p>
+      
         
         <div style="margin-top: 20px;">
             <a onclick='send_seats()' href="#" class="btn btn-primary" id="add-to-cart-btn" style="width: 200px;">Add to Cart</a>
@@ -86,7 +75,7 @@
         const seatNames = Array.from(selectedSeats).map(s => s.getAttribute('data-seat'));
         
         totalTickets.innerText = count;
-        totalAmount.innerText = '$' + (count * ticketPrice);
+        
         selectedSeatsList.innerText = seatNames.length > 0 ? seatNames.join(', ') : 'None';
     }
 

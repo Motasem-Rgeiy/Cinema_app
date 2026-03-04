@@ -1,20 +1,22 @@
+
+
 <nav>
     <div class="nav-content">
-        <a href="/" class="logo">Cinema</a>
+        <p class="logo">Cinema</p>
+
         {% if user.is_authenticated %}
-
-        <a href="{% url "cart" %}" class="btn cart-link">
-            <i class="fas fa-shopping-cart"></i> Cart ({{ticket_counts}}) 
-        </a>
-
         <div class="nav-links">
             <a href="/" class="btn">Movies</a>
             <a href="{% url "my_bookings" %}" class="btn">My Bookings</a>
-            <form method="POST" action=
-'{% url "logout" %}'
->
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">Log Out</button>
+            <a href="{% url "cart" %}" class="btn cart-link">
+                <i class="fas fa-shopping-cart"></i> Cart ({{ ticket_counts }})
+            </a>
+            <a href="{% url "profile" %}" class="btn user-name">
+                <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
+            </a>
+            <form method="POST" action="{% url "logout" %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Log Out</button>
             </form>
         </div>
         {% endif %}

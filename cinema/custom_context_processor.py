@@ -8,8 +8,11 @@ def ticket_website(request):
     if cart and cart.items:
         ticket_ids = cart.items
         tickets = models.Ticket.objects.filter(pk__in=ticket_ids)
-    
         for ticket in tickets:
+            if ticket.status == models.TicketStatus.COMPLETED or ticket.status == models.TicketStatus.CANCELLED:
+                cart.items.remove(ticket.id)
+                cart.save() 
+                continue
             total +=ticket.showtime.price
             my_tickets.append(ticket)
 
