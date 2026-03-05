@@ -1,9 +1,14 @@
 from .models import Showtime , ShowtimeStatus , TicketStatus 
 from datetime import datetime
+from django.db.models import Q
+
 
 def showtime_processing():
-
-    showtimes = Showtime.objects.all()
+    #showtimes =  Showtime.objects.all()
+    showtimes = Showtime.objects.filter(
+              Q(status=ShowtimeStatus.OPEN)|(
+                   Q(status=ShowtimeStatus.RUNNING))
+         )
     for showtime in showtimes:
 
                 start_datetime = datetime.fromisoformat(f"{str(showtime.date)} {str(showtime.start_time)}")

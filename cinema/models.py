@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
+#from django.contrib.sessions.models import Session
 # Create your models here.
 
 
@@ -72,11 +72,7 @@ class Showtime(models.Model):
 
 
 
-#To check for available chairs
-class ShowSeat(models.Model):
-    showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE)
-    row = models.IntegerField()
-    number = models.IntegerField()
+
 
 
 class TicketStatus(models.IntegerChoices):
@@ -94,6 +90,13 @@ class Ticket(models.Model):
     seat = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True , null=True)
     updated_at = models.DateTimeField(auto_now=True , null=True)
+
+    def __str__(self):
+        return str(self.id)
+    
+    class Meta:
+        verbose_name = 'Ticket'
+        verbose_name_plural = 'Ticket'
 
 
 

@@ -20,6 +20,8 @@ from django.conf.urls.static import static
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+admin.site.site_header = 'Cinema Ticket System'
+admin.site.site_title = 'Cinema Ticket System'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('' , include('cinema.urls')),

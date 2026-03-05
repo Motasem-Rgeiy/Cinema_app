@@ -135,7 +135,7 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 #Email
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_HOST_USER = '8953c079e1a8ee'
-EMAIL_HOST_PASSWORD = 'ed5486eab34f8b'
+EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = '2525'
 
 
