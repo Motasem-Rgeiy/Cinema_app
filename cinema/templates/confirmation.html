@@ -2,6 +2,7 @@
 {% load static %}
 {% load my_filters %}
 
+
 {% block title %}Booking Confirmed - Cinema Booking{% endblock %}
 
 {% block content %}
@@ -22,11 +23,11 @@
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
                 <span>Payment Method:</span>
-                <span style="font-weight: bold;">Credit Card</span>
+                <span style="font-weight: bold;">{{order.get_payment_method_display}}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1.2rem;">
                 <span>Total Amount:</span>
-                <span style="font-weight: bold; color: #ff4b2b;">{{order.total|currency}}</span>
+                <span style="font-weight: bold; color: #ff4b2b;">{{order.amount|currency}}</span>
             </div>
         </div>
 

@@ -20,8 +20,11 @@ from django.conf.urls.static import static
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
+admin.site.site_header = 'Cinema Ticket System'
+admin.site.site_title = 'Cinema Ticket System'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('' , include('cinema.urls')),
     path('accounts/' , include('accounts.urls')),
+    path('checkout/' , include('checkout.urls'))
 ] + static(settings.MEDIA_URL , document_root=settings.MEDIA_ROOT) +  debug_toolbar_urls()

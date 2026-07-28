@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cinema',
     'accounts',
+    'checkout',
     "debug_toolbar",
     'django_q',
 ]
@@ -132,10 +133,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/accounts/login'
 
 
+from dotenv import load_dotenv
+load_dotenv()
+
 #Email
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_HOST_USER = '8953c079e1a8ee'
-EMAIL_HOST_PASSWORD = 'ed5486eab34f8b'
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = '2525'
 
 
@@ -150,3 +154,13 @@ Q_CLUSTER = {
     'name': 'CinemaProject',
     'orm': 'default',  # This tells it to use your Django DB
 }
+
+
+
+
+
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Sw2OHJXWlyyMvuGr1qnfnCLf7Hjxv1NInFWpPjy0MHuhlDlyiSqLY6XIscVusM0RN4wyDF35qcQkQXIULRxoRPX00QdW2IIJ5'
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_ENDPOINT_SECRET = 'whsec_0bdbd9ffa3e932501794262dfa59395abeaf2154d54a2a5eae12a7e731af8788'
+CURRENCY = 'USD'

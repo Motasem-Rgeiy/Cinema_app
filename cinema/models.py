@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
+from checkout.models import Transaction
+#from django.contrib.sessions.models import Session
 # Create your models here.
 
 
@@ -72,11 +73,7 @@ class Showtime(models.Model):
 
 
 
-#To check for available chairs
-class ShowSeat(models.Model):
-    showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE)
-    row = models.IntegerField()
-    number = models.IntegerField()
+
 
 
 class TicketStatus(models.IntegerChoices):
@@ -95,18 +92,24 @@ class Ticket(models.Model):
     created_at = models.DateTimeField(auto_now_add=True , null=True)
     updated_at = models.DateTimeField(auto_now=True , null=True)
 
+    def __str__(self):
+        return str(self.id)
+    
+    class Meta:
+        verbose_name = 'Ticket'
+        verbose_name_plural = 'Ticket'
+
 
 
 
 class Order(models.Model):
-    total = models.FloatField()
-    customer = models.JSONField(default=dict)
+    transaction = models.OneToOneField(Transaction , on_delete=models.PROTECT ,null=True)
+  #  total = models.FloatField()
+ #   customer = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True , null=True)
     updated_at = models.DateTimeField(auto_now=True , null=True)
 
-    @property
-    def customer_name(self):
-        return f"{self.customer['first_name']} {self.customer['last_name']}"
+    
 
 
 

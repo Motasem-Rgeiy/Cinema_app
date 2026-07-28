@@ -8,9 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 import secrets
-from .helper import ticket_generation_pdf , convert_to_numeric
-from django.template.loader import render_to_string
-from django.core.mail import send_mail 
+from .helper import  convert_to_numeric
 from .templatetags.my_filters import seat_number
 from django.db.models import Q
 
@@ -18,6 +16,7 @@ from django.db.models import Q
 
 # Create your views here.
 
+#List all available movies with showtime status = Open or running
 class EventListView(LoginRequiredMixin,ListView):
     model = models.Movie
     paginate_by = 4
@@ -49,12 +48,6 @@ def movieDetails(request , mid):
  
     locations = models.Location.objects.filter(pk__in=[loc.location_id for loc in showtimes])
  
-    
- #   for showtime in showtimes:
-
-     #           location = models.Location.objects.filter(pk=showtime.location_id).last()
-      #          if location not in locations:
-  #                   locations.append(location)
   
     return render(request , 'book/movie_details.html' , {'movie':movie , 'locations':locations})
 
@@ -72,16 +65,14 @@ def get_showtimes(request):
     movie_id = request.GET.get('movie_id')
     location_id = request.GET.get('location_id')
     showtimes = models.Showtime.objects.filter(movie_id = movie_id , location = location_id , status__in=[models.ShowtimeStatus.OPEN , models.ShowtimeStatus.RUNNING])
-    print(showtimes)
     data = []
-    #Doing status different cases!
     for show in showtimes:
         data.append({'id':show.id , 'start_time':show.start_time , 'date':show.date , 'price':show.price , 'status':show.status})
     
     return JsonResponse({'showtimes':data})
 
 
-
+#Save the selected showtime the user wants in a temporary session
 @login_required
 @csrf_exempt
 def save_selected_showtime(request):
@@ -90,13 +81,12 @@ def save_selected_showtime(request):
         request.session.create()
        
     request.session['selected_showtime_id'] = json.loads(request.body)
-    print('Second', request.session['selected_showtime_id'])
   
     
     return JsonResponse({'status': 'success', 'redirect_url': '/select/seat'})
 
 
-
+#Get all seats of the selected showtime
 @login_required
 @csrf_exempt
 def get_seats(request):
@@ -104,9 +94,8 @@ def get_seats(request):
      if not show_id:
                return HttpResponse('<h1>Select a showtime first!</h1>')
           
-     show_seats = models.ShowSeat.objects.filter(showtime_id = show_id)
-     tickets = models.Ticket.objects.filter(showtime_id = show_id , status__in=[models.TicketStatus.BOOKED , models.TicketStatus.RESERVED]) #
-          # reserved_seats = [(seat.row , seat.number) for seat in show_seats]
+    
+     tickets = models.Ticket.objects.filter(showtime_id = show_id , status__in=[models.TicketStatus.BOOKED , models.TicketStatus.RESERVED]) 
      reserved_seats = [ticket.seat for ticket in tickets if ticket.seat]
           
     
@@ -125,7 +114,6 @@ def get_seats(request):
      return render(request , 'seat_selection.html', {'rows':rows,
                                                        'columns':columns ,
                                                        'showtime':showtime , 
-                                                       'show_seats':show_seats,
                                                        'reserved_seats': reserved_seats
                                              })
 
@@ -156,7 +144,7 @@ def cart_add(request):
         
         tickets = [ticket.id for ticket in models.Ticket.objects.bulk_create(tickets)]
         
-      #  models.ShowSeat.objects.bulk_create(showSeatList)
+     
 
         cart_model = models.Cart.objects.filter(user = request.user.id).last()
         if cart_model is None:
@@ -174,7 +162,7 @@ def cart_add(request):
    
     
 
-#Get the cart by session
+#Get the cart by user
 #Get the required ticket
 #delete the ticket
 @login_required
@@ -193,9 +181,25 @@ def cart_remove(request , id):
      return JsonResponse({'message':'The ticket has been removed' , 'status': 'ok'})
      
      
+@login_required
+def payment(request):
+          cart_model = models.Cart.objects.filter(user = request.user).last()
+          if not cart_model:
+                return HttpResponse('<h1>The cart is empty!</h1>')
+          if not cart_model.items:
+               return HttpResponse('<h1>The cart is empty!</h1>')
+          credentials = {}
+          if request.user.is_authenticated:
+               credentials = {
+                    'first_name':request.user.first_name,
+                    'last_name':request.user.last_name ,
+                    'email': request.user.email ,
+                    'password': request.user.password,
+               }
+         
+          return render(request , 'payment.html' , {'credentials':credentials})
 
-
-
+'''
 def make_order(request):
      if request.method == 'POST':
           email = request.POST['email']
@@ -223,6 +227,9 @@ def make_order(request):
                        
 
      else:
+          cart_model = models.Cart.objects.filter(user = request.user).last()
+          if not cart_model.items:
+               return HttpResponse('<h1>The cart is empty!</h1>')
           credentials = {}
           if request.user.is_authenticated:
                credentials = {
@@ -247,8 +254,9 @@ def order_mail(tickets_obj , order_obj):
                recipient_list=[order_obj.customer['email']]
 
                )
-
-
+'''
+#Get all booking activity and arrange same showtime based on their status 
+@login_required
 def userDashboard(request):
      tickets = models.Ticket.objects.filter(user = request.user).select_related('showtime')
  
@@ -280,8 +288,6 @@ def userDashboard(request):
      return render(request , 'dasboard.html' , {  'dashboard':dash})
 
 
-#RunTime <class 'datetime.timedelta'>
-#startTime <class 'datetime.time'>
 
 
 '''maybe used later
